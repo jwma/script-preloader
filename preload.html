@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>Loading...</title>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            text-align: center;
+            margin: 30px auto 0;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+    <div class="loading-text">
+        loading...
+    </div>
+    <script>
+        function init() {
+            setTimeout(function () {
+                preload([
+                    '/js/script1.js',
+                    '/js/script2.js'
+                ], function () {
+                    window.localStorage.setItem('isJSPreLoaded', 1)
+                    if (getURLParameter('fromUrl')) {
+                        window.location.href = getURLParameter('fromUrl')
+                    }
+                })
+            }, 2500)
+        }
+
+        function preload(resources, doneCallback) {
+            var total = resources.length
+            var loadedCount = 0
+
+            for (var i = 0; i < resources.length; i++) {
+                var script = document.createElement('object')
+                script.style.width = 0
+                script.style.height = 0
+                script.data = resources[i]
+
+                script.onload = function () {
+                    loadedCount += 1
+
+                    if (loadedCount === total) {
+                        typeof doneCallback === 'function' && doneCallback()
+                    }
+                }
+
+                document.body.appendChild(script)
+            }
+        }
+
+        function getURLParameter(name) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+        }
+    </script>
+</body>
+
+</html>
